@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🎯 潛在客戶搜尋系統</title>
+  <script src="https://cdn.jsdelivr.net/npm/@line/liff@2/dist/liff.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f5; }
+    
+    .header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .header h1 { font-size: 1.3rem; }
+    
+    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    
+    .search-box { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .search-box h2 { margin-bottom: 15px; color: #333; }
+    .search-form { display: flex; gap: 10px; }
+    .search-form input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
+    .search-form button { padding: 12px 24px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; }
+    .search-form button:disabled { background: #ccc; }
+    
+    .quick-search { margin-top: 15px; }
+    .quick-search span { color: #666; font-size: 0.9rem; margin-right: 10px; }
+    .quick-btn { padding: 6px 14px; background: #f0f0f0; border: none; border-radius: 20px; cursor: pointer; font-size: 0.85rem; margin-right: 5px; margin-bottom: 5px; }
+    .quick-btn:hover { background: #e0e0e0; }
+    
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .stat-card .num { font-size: 1.8rem; font-weight: bold; color: #667eea; }
+    .stat-card .label { color: #666; font-size: 0.85rem; margin-top: 5px; }
+    
+    .results { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .results-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .results-header h3 { color: #333; }
+    .results-header button { padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    
+    .lead-item { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; gap: 15px; }
+    .lead-item:last-child { border-bottom: none; }
+    .lead-score { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
+    .lead-content { flex: 1; min-width: 0; }
+    .lead-title { font-weight: bold; color: #333; margin-bottom: 5px; }
+    .lead-url { color: #667eea; font-size: 0.85rem; text-decoration: none; word-break: break-all; }
+    .lead-url:hover { text-decoration: underline; }
+    .lead-content2 { color: #666; font-size: 0.8rem; margin-top: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .lead-meta { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
+    .lead-tag { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; }
+    .lead-tag.new { background: #e3f2fd; color: #1976d2; }
+    .lead-tag.contacted { background: #fff3e0; color: #f57c00; }
+    .lead-tag.interested { background: #e8f5e9; color: #388e3c; }
+    .lead-tag.no { background: #ffebee; color: #c62828; }
+    
+    .lead-actions { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
+    .lead-actions button { padding: 4px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.75rem; }
+    .btn-contact { background: #06C755; color: white; }
+    .btn-interest { background: #ffa502; color: white; }
+    .btn-no { background: #ff4757; color: white; }
+    .btn-del { background: #999; color: white; }
+    
+    .loading { text-align: center; padding: 40px; color: #666; }
+    .empty { text-align: center; padding: 40px; color: #999; }
+    
+    .toast { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; opacity: 0; transition: opacity 0.3s; }
+    .toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🎯 潛在客戶搜尋系統</h1>
+  </div>
+  
+  <div class="container">
+    <!-- 搜尋框 -->
+    <div class="search-box">
+      <h2>🔍 搜尋講師</h2>
+      <div class="search-form">
+        <input type="text" id="searchInput" placeholder="輸入關鍵字，例如：健身教練、英文老師...">
+        <button onclick="doSearch()" id="searchBtn">搜尋</button>
+      </div>
+      <div class="quick-search">
+        <span>快速搜尋：</span>
+        <button class="quick-btn" onclick="quickSearch('健身教練 線上課程')">健身</button>
+        <button class="quick-btn" onclick="quickSearch('英文老師 線上課程')">英文</button>
+        <button class="quick-btn" onclick="quickSearch('理財投資 課程 LINE')">理財</button>
+        <button class="quick-btn" onclick="quickSearch('LINE行銷 課程 講師')">LINE行銷</button>
+        <button class="quick-btn" onclick="quickSearch('AI教學 線上課程')">AI</button>
+        <button class="quick-btn" onclick="quickSearch('創業 變現 課程')">創業</button>
+        <button class="quick-btn" onclick="quickSearch('知識付費 講師')">知識付費</button>
+        <button class="quick-btn" onclick="quickSearch('podcast 課程 講師')">Podcast</button>
+        <button class="quick-btn" onclick="quickSearch('健身教練 線上課程', true)" style="background:#ffa502;color:white;">🔄 強制重搜</button>
+      </div>
+    </div>
+    
+    <!-- 統計 -->
+    <div class="stats">
+      <div class="stat-card">
+        <div class="num" id="totalCount">0</div>
+        <div class="label">總數據</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="newCount">0</div>
+        <div class="label">新資料</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="contactedCount">0</div>
+        <div class="label">已聯繫</div>
+      </div>
+      <div class="stat-card">
+        <div class="num" id="interestedCount">0</div>
+        <div class="label">有興趣</div>
+      </div>
+    </div>
+    
+    <!-- 結果列表 -->
+    <div class="results">
+      <div class="results-header">
+        <h3>📋 搜尋結果</h3>
+        <button onclick="loadLeads()">🔄 重新整理</button>
+      </div>
+      <div id="resultsList">
+        <div class="loading">載入中...</div>
+      </div>
+    </div>
+  </div>
+  
+  <div class="toast" id="toast"></div>
+
+  <script>
+    let allLeads = [];
+    
+    // 初始化
+    window.onload = function() {
+      loadLeads();
+    };
+    
+    // 快速搜尋
+    function quickSearch(keyword, force = false) {
+      document.getElementById('searchInput').value = keyword;
+      doSearch(force);
+    }
+    
+    // 搜尋
+    async function doSearch(force = false) {
+      const keyword = document.getElementById('searchInput').value.trim();
+      if (!keyword) return;
+      
+      const btn = document.getElementById('searchBtn');
+      btn.disabled = true;
+      btn.textContent = '搜尋中...';
+      
+      try {
+        const res = await fetch('/api/leads/search', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ keyword, force })
+        });
+        const data = await res.json();
+        
+        if (data.error) {
+          showToast('❌ ' + data.error);
+        } else if (data.message) {
+          showToast('📋 ' + data.message);
+          loadLeads();
+        } else {
+          showToast('✅ 新增 ' + data.count + ' 筆（總共 ' + data.total + ' 筆）');
+          loadLeads();
+        }
+      } catch(e) {
+        showToast('❌ 搜尋失敗: ' + e.message);
+      }
+      
+      btn.disabled = false;
+      btn.textContent = '搜尋';
+    }
+    
+    // 載入
+    async function loadLeads() {
+      const list = document.getElementById('resultsList');
+      list.innerHTML = '<div class="loading">載入中...</div>';
+      
+      try {
+        const res = await fetch('/api/leads');
+        allLeads = await res.json();
+        renderLeads();
+        updateStats();
+      } catch(e) {
+        list.innerHTML = '<div class="empty">載入失敗: ' + e.message + '</div>';
+      }
+    }
+    
+    // 渲染
+    function renderLeads() {
+      const list = document.getElementById('resultsList');
+      
+      if (allLeads.length === 0) {
+        list.innerHTML = '<div class="empty">尚無資料，請先搜尋講師關鍵字</div>';
+        return;
+      }
+      
+      // 依分數排序
+      allLeads.sort((a, b) => (b.score || 0) - (a.score || 0));
+      
+      list.innerHTML = allLeads.map(lead => {
+        const tagClass = lead.status || 'new';
+        const tagText = { 'new': '新資料', 'contacted': '已聯繫', 'interested': '有興趣', 'no': '暫無興趣' }[tagClass] || '新資料';
+        
+        return `
+          <div class="lead-item">
+            <div class="lead-score">${lead.score || 0}</div>
+            <div class="lead-content">
+              <div class="lead-title">${lead.title || '無標題'}</div>
+              <a href="${lead.url || '#'}" target="_blank" class="lead-url">${(lead.url || '').substring(0, 70)}...</a>
+              <div class="lead-content2">${lead.content || ''}</div>
+              <div class="lead-meta">
+                <span class="lead-tag ${tagClass}">${tagText}</span>
+                <span style="color:#999;font-size:0.75rem;">${new Date(lead.createdAt).toLocaleDateString()}</span>
+              </div>
+            </div>
+            <div class="lead-actions">
+              <button class="btn-contact" onclick="updateStatus('${lead.id}', 'contacted')">已聯繫</button>
+              <button class="btn-interest" onclick="updateStatus('${lead.id}', 'interested')">有興趣</button>
+              <button class="btn-no" onclick="updateStatus('${lead.id}', 'no')">無興趣</button>
+              <button class="btn-del" onclick="deleteLead('${lead.id}')">刪除</button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    // 更新狀態
+    async function updateStatus(id, status) {
+      await fetch('/api/leads/update', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ id, status })
+      });
+      loadLeads();
+    }
+    
+    // 刪除
+    async function deleteLead(id) {
+      if (!confirm('確定要刪除嗎？')) return;
+      await fetch('/api/leads/' + id, { method: 'DELETE' });
+      loadLeads();
+    }
+    
+    // 統計
+    function updateStats() {
+      document.getElementById('totalCount').textContent = allLeads.length;
+      document.getElementById('newCount').textContent = allLeads.filter(l => l.status === 'new' || !l.status).length;
+      document.getElementById('contactedCount').textContent = allLeads.filter(l => l.status === 'contacted').length;
+      document.getElementById('interestedCount').textContent = allLeads.filter(l => l.status === 'interested').length;
+    }
+    
+    // 提示
+    function showToast(msg) {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+  </script>
+</body>
+</html>
