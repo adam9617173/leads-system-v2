@@ -191,6 +191,10 @@
         <label>評分原因：</label>
         <input type="text" id="editReason" placeholder="為什麼給這個分數">
       </div>
+      <div class="form-row">
+        <label>談判切入點：</label>
+        <input type="text" id="editTalkTips" placeholder="如何跟這位老師開啟話題">
+      </div>
       
       <div class="modal-buttons">
         <button class="btn-cancel" onclick="closeModal()">取消</button>
@@ -316,6 +320,12 @@
               📊 評分原因：${lead.reason || '待 AI 分析'}
             </div>
             
+            ${lead.talk_tips ? `
+            <div class="lead-tips" style="background:#e8f5e9;padding:10px 15px;border-radius:8px;font-size:0.85rem;color:#2e7d32;border-left:3px solid #4caf50;margin-bottom:15px;">
+              💡 談判切入點：${lead.talk_tips}
+            </div>
+            ` : ''}
+            
             <a href="${lead.url || '#'}" target="_blank" class="lead-url">${lead.url || ''}</a>
             
             <div class="lead-actions" style="margin-top:15px;">
@@ -343,6 +353,7 @@
       document.getElementById('editOther').value = lead.other_contact || '';
       document.getElementById('editScore').value = lead.score || 0;
       document.getElementById('editReason').value = lead.reason || '';
+      document.getElementById('editTalkTips').value = lead.talk_tips || '';
       
       document.getElementById('editModal').classList.add('show');
     }
@@ -360,7 +371,8 @@
         fb: document.getElementById('editFb').value,
         other_contact: document.getElementById('editOther').value,
         score: parseInt(document.getElementById('editScore').value) || 0,
-        reason: document.getElementById('editReason').value
+        reason: document.getElementById('editReason').value,
+        talk_tips: document.getElementById('editTalkTips').value
       };
       
       await fetch('/api/leads/update', {

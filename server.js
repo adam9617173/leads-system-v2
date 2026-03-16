@@ -65,7 +65,8 @@ async function analyzeWithGemini(title, url, content) {
   "fb": "Facebook 粉絲團或粉專連結",
   "other_contact": "其他聯繫方式",
   "score": 成交率評分（0-100 的整數，根據：1.他的教學內容是否需要助教 2.他是否有痛點 3.27,000是否能負擔 4.買了能否幫他賺更多 5.他是否願意嘗試新工具）",
-  "reason": "評分原因說明（50字以內）"
+  "reason": "評分原因說明（50字以內）",
+  "talk_tips": "談判切入點（3個具體建議，如何跟這位老師開啟話題，例如：稱讚他的課程、提到某個痛點、分享某個成功案例等）"
 }
 
 只回傳 JSON，不要其他文字。`;
@@ -217,7 +218,7 @@ app.get('/api/leads', (req, res) => {
 
 // 更新 lead
 app.post('/api/leads/update', (req, res) => {
-  const { id, status, notes, line, phone, email, fb, other_contact, score, reason } = req.body;
+  const { id, status, notes, line, phone, email, fb, other_contact, score, reason, talk_tips } = req.body;
   const leads = getLeads();
   const index = leads.findIndex(l => l.id === id);
   
@@ -233,6 +234,7 @@ app.post('/api/leads/update', (req, res) => {
       other_contact: other_contact ?? leads[index].other_contact,
       score: score ?? leads[index].score,
       reason: reason ?? leads[index].reason,
+      talk_tips: talk_tips ?? leads[index].talk_tips,
       updatedAt: new Date().toISOString() 
     };
     saveLeads(leads);
