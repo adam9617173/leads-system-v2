@@ -132,8 +132,6 @@ app.post('/api/leads/search', async (req, res) => {
   
   // 每次都搜尋，用 URL 比對是否重複
   try {
-    res.write('搜尋中...\n');
-    
     const response = await axios.post('https://api.tavily.com/search', {
       query: keyword + ' 線上課程 講師',
       api_key: TAVILY_API_KEY,
@@ -141,13 +139,12 @@ app.post('/api/leads/search', async (req, res) => {
     }, { timeout: 15000 });
     
     const results = response.data.results || [];
-    res.write(`找到 ${results.length} 筆搜尋結果，開始 AI 分析...\n`);
     
     // 逐一分析
     const leads = [];
     for (let i = 0; i < results.length; i++) {
       const r = results[i];
-      res.write(`分析第 ${i + 1} / ${results.length} 筆...\n`);
+      console.log(`分析第 ${i + 1} / ${results.length} 筆...`);
       
       const aiAnalysis = await analyzeWithGemini(r.title, r.url, r.content);
       
