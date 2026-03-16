@@ -10,7 +10,7 @@ app.use(express.json());
 app.use(express.static('public'));
 
 // API Keys
-const GOOGLE_API_KEY = 'AIzaSyB2REixdS8i8j6xGRDhy0sMhB7q7nWGEDY';
+const GOOGLE_API_KEY = 'AIzaSyCfxldtVFOGcQLoVBc5bMyKECi1uKQ8lCY';
 const TAVILY_API_KEY = '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';
 
 // 資料庫路徑
