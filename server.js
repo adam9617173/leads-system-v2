@@ -31,8 +31,25 @@ function saveLeads(leads) {
 
 // Gemini AI 分析函數
 async function analyzeWithGemini(title, url, content) {
-  const prompt = `你是一個專業的銷售教練，請分析以下這位知識付費領域的講師資料：
+  const prompt = `你是一個專業的業務，請分析這位知識付費領域的講師資料，評估他有多大的機率會購買「伴讀精靈」。
 
+【伴讀精靈產品介紹】
+- 價格：27,000 TWD
+- 產品：AI 助教服務（安裝在 LINE@）
+- 功能：
+  - 幫老師處理學生問題
+  - 自動回覆學員問題
+  - 教材導讀
+  - 個人化學習輔導
+- 隱藏價值：
+  - 建立私域流量（LINE@ 是自己的客戶名單）
+  - 養客（持續與學生互動，培養長期關係）
+  - 未來可群發活動、優惠
+  - 24/7 自動化服務
+  - 可服務無限學生
+  - 資料收集了解客戶需求
+
+【要分析的講師資料】
 標題：${title}
 網址：${url}
 內容摘要：${content}
@@ -42,13 +59,13 @@ async function analyzeWithGemini(title, url, content) {
 {
   "name": "講師名字或暱稱",
   "niche": "細分賽道（例如：健身教練、雅思考試、理財投資、AI工具教學等）",
-  "line": "LINE ID 或 LINE@（例如：@xxx）",
+  "line": "LINE ID 或 LINE@",
   "phone": "電話號碼",
   "email": "電子郵件",
   "fb": "Facebook 粉絲團或粉專連結",
-  "other_contact": "其他聯繫方式（如 Telegram、Instagram 等）",
-  "score": 成交率評分（0-100 的整數，根據：課程價格市場接受度、需求剛性、競爭程度、變現能力）",
-  "reason": "評分原因說明（30-50字）"
+  "other_contact": "其他聯繫方式",
+  "score": 成交率評分（0-100 的整數，根據：1.他的教學內容是否需要助教 2.他是否有痛點 3.27,000是否能負擔 4.買了能否幫他賺更多 5.他是否願意嘗試新工具）",
+  "reason": "評分原因說明（50字以內）"
 }
 
 只回傳 JSON，不要其他文字。`;
