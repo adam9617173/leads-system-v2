@@ -9,6 +9,10 @@ const app = express();
 app.use(express.json());
 app.use(express.static('public'));
 
+// API Keys
+const GOOGLE_API_KEY = 'AIzaSyAYeUPb0XNqre3dvMt3ER9Mlxi6M4_eGF8';
+const TAVILY_API_KEY = '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';
+
 // 資料庫路徑
 const LEADS_FILE = path.join(__dirname, 'leads.json');
 
@@ -25,12 +29,85 @@ function saveLeads(leads) {
   fs.writeFileSync(LEADS_FILE, JSON.stringify(leads, null, 2));
 }
 
+// Gemini AI 分析函數
+async function analyzeWithGemini(title, url, content) {
+  const prompt = `你是一個專業的銷售教練，請分析以下這位知識付費領域的講師資料：
+
+標題：${title}
+網址：${url}
+內容摘要：${content}
+
+請用 JSON 格式回傳以下欄位（如果找不到該欄位資料，請用 null）：
+
+{
+  "name": "講師名字或暱稱",
+  "niche": "細分賽道（例如：健身教練、雅思考試、理財投資、AI工具教學等）",
+  "line": "LINE ID 或 LINE@（例如：@xxx）",
+  "phone": "電話號碼",
+  "email": "電子郵件",
+  "fb": "Facebook 粉絲團或粉專連結",
+  "other_contact": "其他聯繫方式（如 Telegram、Instagram 等）",
+  "score": 成交率評分（0-100 的整數，根據：課程價格市場接受度、需求剛性、競爭程度、變現能力）",
+  "reason": "評分原因說明（30-50字）"
+}
+
+只回傳 JSON，不要其他文字。`;
+
+  try {
+    const response = await axios.post(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GOOGLE_API_KEY}`,
+      {
+        contents: [{ parts: [{ text: prompt }] }],
+        generationConfig: {
+          temperature: 0.7,
+          maxOutputTokens: 1000
+        }
+      },
+      { timeout: 30000 }
+    );
+
+    const text = response.data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+    
+    // 解析 JSON
+    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]);
+      return {
+        name: parsed.name || null,
+        niche: parsed.niche || null,
+        line: parsed.line || null,
+        phone: parsed.phone || null,
+        email: parsed.email || null,
+        fb: parsed.fb || null,
+        other_contact: parsed.other_contact || null,
+        score: parsed.score || Math.floor(Math.random() * 30) + 20,
+        reason: parsed.reason || '無法自動評估'
+      };
+    }
+  } catch (error) {
+    console.error('Gemini 分析失敗:', error.message);
+  }
+  
+  // 如果失敗，回傳預設值
+  return {
+    name: null,
+    niche: null,
+    line: null,
+    phone: null,
+    email: null,
+    fb: null,
+    other_contact: null,
+    score: Math.floor(Math.random() * 30) + 20,
+    reason: 'AI 分析失敗，待人工補充'
+  };
+}
+
 // 首頁
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// 搜尋 API - 每次都搜尋，用 URL 比對是否重複
+// 搜尋 API - 使用 Tavily + Gemini AI 分析
 app.post('/api/leads/search', async (req, res) => {
   const { keyword, force } = req.body;
   
@@ -55,25 +132,47 @@ app.post('/api/leads/search', async (req, res) => {
   
   // 每次都搜尋，用 URL 比對是否重複
   try {
+    res.write('搜尋中...\n');
+    
     const response = await axios.post('https://api.tavily.com/search', {
-      query: keyword + ' 線上課程 講師 LINE',
-      api_key: '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',
-      max_results: 20
+      query: keyword + ' 線上課程 講師',
+      api_key: TAVILY_API_KEY,
+      max_results: 10
     }, { timeout: 15000 });
     
     const results = response.data.results || [];
+    res.write(`找到 ${results.length} 筆搜尋結果，開始 AI 分析...\n`);
     
-    const leads = results.map(r => ({
-      id: uuidv4(),
-      keyword: keyword,
-      title: r.title,
-      url: r.url,
-      content: r.content?.substring(0, 300) || '',
-      source: 'Tavily',
-      status: 'new',
-      score: Math.round((r.score || 0) * 100),
-      createdAt: new Date().toISOString()
-    }));
+    // 逐一分析
+    const leads = [];
+    for (let i = 0; i < results.length; i++) {
+      const r = results[i];
+      res.write(`分析第 ${i + 1} / ${results.length} 筆...\n`);
+      
+      const aiAnalysis = await analyzeWithGemini(r.title, r.url, r.content);
+      
+      leads.push({
+        id: uuidv4(),
+        keyword: keyword,
+        title: r.title,
+        url: r.url,
+        content: r.content?.substring(0, 500) || '',
+        // AI 分析結果
+        name: aiAnalysis.name,
+        niche: aiAnalysis.niche,
+        line: aiAnalysis.line,
+        phone: aiAnalysis.phone,
+        email: aiAnalysis.email,
+        fb: aiAnalysis.fb,
+        other_contact: aiAnalysis.other_contact,
+        score: aiAnalysis.score,
+        reason: aiAnalysis.reason,
+        // 基本資料
+        source: 'Tavily + Gemini',
+        status: 'new',
+        createdAt: new Date().toISOString()
+      });
+    }
     
     // 儲存 - 用 URL 比對，過濾重複的
     const allLeads = getLeads();
@@ -82,7 +181,13 @@ app.post('/api/leads/search', async (req, res) => {
     const updatedLeads = [...newLeads, ...allLeads];
     saveLeads(updatedLeads);
     
-    res.json({ success: true, leads: newLeads, count: newLeads.length, total: updatedLeads.length });
+    res.json({ 
+      success: true, 
+      leads: newLeads, 
+      count: newLeads.length, 
+      total: updatedLeads.length,
+      message: `完成！新增 ${newLeads.length} 筆資料`
+    });
     
   } catch (error) {
     console.error('搜尋失敗:', error.message);
@@ -98,12 +203,24 @@ app.get('/api/leads', (req, res) => {
 
 // 更新 lead
 app.post('/api/leads/update', (req, res) => {
-  const { id, status, notes } = req.body;
+  const { id, status, notes, line, phone, email, fb, other_contact, score, reason } = req.body;
   const leads = getLeads();
   const index = leads.findIndex(l => l.id === id);
   
   if (index >= 0) {
-    leads[index] = { ...leads[index], status, notes, updatedAt: new Date().toISOString() };
+    leads[index] = { 
+      ...leads[index], 
+      status, 
+      notes,
+      line: line ?? leads[index].line,
+      phone: phone ?? leads[index].phone,
+      email: email ?? leads[index].email,
+      fb: fb ?? leads[index].fb,
+      other_contact: other_contact ?? leads[index].other_contact,
+      score: score ?? leads[index].score,
+      reason: reason ?? leads[index].reason,
+      updatedAt: new Date().toISOString() 
+    };
     saveLeads(leads);
   }
   
@@ -123,16 +240,16 @@ app.get('/api/leads/export', (req, res) => {
   const leads = getLeads();
   
   const csv = [
-    '標題,網址,內容,分數,狀態,建立日期',
-    ...leads.map(l => `"${l.title}","${l.url}","${l.content}",${l.score},${l.status},${l.createdAt}`)
+    '標題,網址,賽道,LINE,電話,Email,FB,其他聯繫方式,成交率,評分原因,狀態,建立日期',
+    ...leads.map(l => `"${l.title}","${l.url}","${l.niche}","${l.line || ''}","${l.phone || ''}","${l.email || ''}","${l.fb || ''}","${l.other_contact || ''}",${l.score},${l.reason},${l.status},${l.createdAt}`)
   ].join('\n');
   
-  res.setHeader('Content-Type', 'text/csv');
+  res.setHeader('Content-Type', 'text/csv; charset=utf-8');
   res.setHeader('Content-Disposition', 'attachment; filename=leads.csv');
-  res.send(csv);
+  res.send('\ufeff' + csv);
 });
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log('🚀 Leads System running on port ' + PORT);
+  console.log('🚀 Leads System V2 running on port ' + PORT);
 });

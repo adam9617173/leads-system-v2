@@ -3,71 +3,103 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎯 潛在客戶搜尋系統</title>
-  <script src="https://cdn.jsdelivr.net/npm/@line/liff@2/dist/liff.min.js"></script>
+  <title>🎯 潛在客戶搜尋系統 V2</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f5f5; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; }
     
-    .header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-    .header h1 { font-size: 1.3rem; }
+    .header { background: linear-gradient(135deg, #1a1a2e, #16213e); color: white; padding: 1rem 2rem; }
+    .header h1 { font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
+    .header .badge { background: #ffa502; color: #333; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; }
     
-    .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
     
     .search-box { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .search-box h2 { margin-bottom: 15px; color: #333; }
     .search-form { display: flex; gap: 10px; }
     .search-form input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
-    .search-form button { padding: 12px 24px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; }
+    .search-form button { padding: 12px 24px; background: #1a1a2e; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; }
     .search-form button:disabled { background: #ccc; }
     
-    .quick-search { margin-top: 15px; }
-    .quick-search span { color: #666; font-size: 0.9rem; margin-right: 10px; }
-    .quick-btn { padding: 6px 14px; background: #f0f0f0; border: none; border-radius: 20px; cursor: pointer; font-size: 0.85rem; margin-right: 5px; margin-bottom: 5px; }
+    .quick-search { margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+    .quick-search span { color: #666; font-size: 0.9rem; }
+    .quick-btn { padding: 6px 14px; background: #f0f0f0; border: none; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
     .quick-btn:hover { background: #e0e0e0; }
+    .quick-btn.force { background: #ffa502; color: #333; }
     
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-bottom: 20px; }
+    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 15px; margin-bottom: 20px; }
     .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .stat-card .num { font-size: 1.8rem; font-weight: bold; color: #667eea; }
-    .stat-card .label { color: #666; font-size: 0.85rem; margin-top: 5px; }
+    .stat-card .num { font-size: 1.8rem; font-weight: bold; color: #1a1a2e; }
+    .stat-card .label { color: #666; font-size: 0.8rem; margin-top: 5px; }
     
     .results { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .results-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
     .results-header h3 { color: #333; }
-    .results-header button { padding: 8px 16px; background: #667eea; color: white; border: none; border-radius: 6px; cursor: pointer; }
+    .results-header button { padding: 8px 16px; background: #1a1a2e; color: white; border: none; border-radius: 6px; cursor: pointer; }
     
-    .lead-item { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; gap: 15px; }
+    .lead-item { padding: 20px; border-bottom: 1px solid #eee; }
     .lead-item:last-child { border-bottom: none; }
-    .lead-score { width: 45px; height: 45px; background: linear-gradient(135deg, #667eea, #764ba2); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; }
-    .lead-content { flex: 1; min-width: 0; }
-    .lead-title { font-weight: bold; color: #333; margin-bottom: 5px; }
-    .lead-url { color: #667eea; font-size: 0.85rem; text-decoration: none; word-break: break-all; }
-    .lead-url:hover { text-decoration: underline; }
-    .lead-content2 { color: #666; font-size: 0.8rem; margin-top: 5px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-    .lead-meta { display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap; }
-    .lead-tag { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; }
-    .lead-tag.new { background: #e3f2fd; color: #1976d2; }
-    .lead-tag.contacted { background: #fff3e0; color: #f57c00; }
-    .lead-tag.interested { background: #e8f5e9; color: #388e3c; }
-    .lead-tag.no { background: #ffebee; color: #c62828; }
     
-    .lead-actions { display: flex; flex-direction: column; gap: 4px; flex-shrink: 0; }
-    .lead-actions button { padding: 4px 10px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.75rem; }
+    .lead-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .lead-title { font-weight: bold; font-size: 1.1rem; color: #333; }
+    .lead-score { 
+      background: linear-gradient(135deg, #667eea, #764ba2); color: white; 
+      padding: 8px 16px; border-radius: 20px; font-weight: bold; 
+    }
+    
+    .lead-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+    .info-group { }
+    .info-label { color: #999; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
+    .info-value { color: #333; font-size: 0.95rem; }
+    .info-value.empty { color: #ccc; font-style: italic; }
+    
+    .lead-contact { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
+    .contact-tag { padding: 4px 12px; border-radius: 15px; font-size: 0.8rem; display: flex; align-items: center; gap: 5px; }
+    .contact-tag.line { background: #06C755; color: white; }
+    .contact-tag.phone { background: #4285f4; color: white; }
+    .contact-tag.email { background: #ea4335; color: white; }
+    .contact-tag.fb { background: #1877f2; color: white; }
+    .contact-tag.other { background: #9c27b0; color: white; }
+    .contact-tag.none { background: #f5f5f5; color: #999; }
+    
+    .lead-reason { background: #fff9e6; padding: 10px 15px; border-radius: 8px; font-size: 0.85rem; color: #666; border-left: 3px solid #ffa502; margin-bottom: 15px; }
+    
+    .lead-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+    .lead-actions button { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+    .btn-edit { background: #667eea; color: white; }
     .btn-contact { background: #06C755; color: white; }
-    .btn-interest { background: #ffa502; color: white; }
+    .btn-interest { background: #ffa502; color: #333; }
     .btn-no { background: #ff4757; color: white; }
     .btn-del { background: #999; color: white; }
+    
+    .lead-url { color: #667eea; font-size: 0.85rem; text-decoration: none; word-break: break-all; }
+    .lead-url:hover { text-decoration: underline; }
     
     .loading { text-align: center; padding: 40px; color: #666; }
     .empty { text-align: center; padding: 40px; color: #999; }
     
-    .toast { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; opacity: 0; transition: opacity 0.3s; }
+    .toast { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; opacity: 0; transition: opacity 0.3s; z-index: 1000; }
     .toast.show { opacity: 1; }
+    
+    /* 編輯 Modal */
+    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; }
+    .modal.show { display: flex; align-items: center; justify-content: center; }
+    .modal-content { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; }
+    .modal h3 { margin-bottom: 20px; color: #333; }
+    .form-group { margin-bottom: 15px; }
+    .form-group label { display: block; color: #666; font-size: 0.85rem; margin-bottom: 5px; }
+    .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; }
+    .form-row { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; align-items: center; }
+    .form-row label { color: #666; font-size: 0.85rem; }
+    .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
+    .modal-buttons button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; }
+    .btn-save { background: #06C755; color: white; }
+    .btn-cancel { background: #ccc; color: #333; }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>🎯 潛在客戶搜尋系統</h1>
+    <h1>🎯 潛在客戶搜尋系統 <span class="badge">V2</span></h1>
   </div>
   
   <div class="container">
@@ -75,8 +107,8 @@
     <div class="search-box">
       <h2>🔍 搜尋講師</h2>
       <div class="search-form">
-        <input type="text" id="searchInput" placeholder="輸入關鍵字，例如：健身教練、英文老師...">
-        <button onclick="doSearch()" id="searchBtn">搜尋</button>
+        <input type="text" id="searchInput" placeholder="輸入關鍵字，例如：健身教練、英文老師、理財課程...">
+        <button onclick="doSearch()" id="searchBtn">搜尋 + AI 分析</button>
       </div>
       <div class="quick-search">
         <span>快速搜尋：</span>
@@ -86,9 +118,7 @@
         <button class="quick-btn" onclick="quickSearch('LINE行銷 課程 講師')">LINE行銷</button>
         <button class="quick-btn" onclick="quickSearch('AI教學 線上課程')">AI</button>
         <button class="quick-btn" onclick="quickSearch('創業 變現 課程')">創業</button>
-        <button class="quick-btn" onclick="quickSearch('知識付費 講師')">知識付費</button>
-        <button class="quick-btn" onclick="quickSearch('podcast 課程 講師')">Podcast</button>
-        <button class="quick-btn" onclick="quickSearch('健身教練 線上課程', true)" style="background:#ffa502;color:white;">🔄 強制重搜</button>
+        <button class="quick-btn force" onclick="quickSearch('健身教練 線上課程', true)">🔄 強制重搜</button>
       </div>
     </div>
     
@@ -116,10 +146,55 @@
     <div class="results">
       <div class="results-header">
         <h3>📋 搜尋結果</h3>
-        <button onclick="loadLeads()">🔄 重新整理</button>
+        <div style="display:flex;gap:10px;">
+          <button onclick="loadLeads()">🔄 重新整理</button>
+          <button onclick="exportCSV()" style="background:#06C755;">📥 匯出 CSV</button>
+        </div>
       </div>
       <div id="resultsList">
         <div class="loading">載入中...</div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- 編輯 Modal -->
+  <div class="modal" id="editModal">
+    <div class="modal-content">
+      <h3>✏️ 編輯資料</h3>
+      <input type="hidden" id="editId">
+      
+      <div class="form-row">
+        <label>LINE：</label>
+        <input type="text" id="editLine" placeholder="@xxx 或 LINE ID">
+      </div>
+      <div class="form-row">
+        <label>電話：</label>
+        <input type="text" id="editPhone" placeholder="09xx-xxx-xxx">
+      </div>
+      <div class="form-row">
+        <label>Email：</label>
+        <input type="text" id="editEmail" placeholder="xxx@gmail.com">
+      </div>
+      <div class="form-row">
+        <label>FB：</label>
+        <input type="text" id="editFb" placeholder="FB 粉絲團連結">
+      </div>
+      <div class="form-row">
+        <label>其他聯繫：</label>
+        <input type="text" id="editOther" placeholder="其他聯繫方式">
+      </div>
+      <div class="form-row">
+        <label>成交率：</label>
+        <input type="number" id="editScore" min="0" max="100">
+      </div>
+      <div class="form-row">
+        <label>評分原因：</label>
+        <input type="text" id="editReason" placeholder="為什麼給這個分數">
+      </div>
+      
+      <div class="modal-buttons">
+        <button class="btn-cancel" onclick="closeModal()">取消</button>
+        <button class="btn-save" onclick="saveEdit()">儲存</button>
       </div>
     </div>
   </div>
@@ -129,25 +204,22 @@
   <script>
     let allLeads = [];
     
-    // 初始化
     window.onload = function() {
       loadLeads();
     };
     
-    // 快速搜尋
     function quickSearch(keyword, force = false) {
       document.getElementById('searchInput').value = keyword;
       doSearch(force);
     }
     
-    // 搜尋
     async function doSearch(force = false) {
       const keyword = document.getElementById('searchInput').value.trim();
       if (!keyword) return;
       
       const btn = document.getElementById('searchBtn');
       btn.disabled = true;
-      btn.textContent = '搜尋中...';
+      btn.textContent = '搜尋 + AI 分析中...';
       
       try {
         const res = await fetch('/api/leads/search', {
@@ -163,7 +235,7 @@
           showToast('📋 ' + data.message);
           loadLeads();
         } else {
-          showToast('✅ 新增 ' + data.count + ' 筆（總共 ' + data.total + ' 筆）');
+          showToast('✅ 完成！新增 ' + data.count + ' 筆，總共 ' + data.total + ' 筆');
           loadLeads();
         }
       } catch(e) {
@@ -171,10 +243,9 @@
       }
       
       btn.disabled = false;
-      btn.textContent = '搜尋';
+      btn.textContent = '搜尋 + AI 分析';
     }
     
-    // 載入
     async function loadLeads() {
       const list = document.getElementById('resultsList');
       list.innerHTML = '<div class="loading">載入中...</div>';
@@ -189,7 +260,6 @@
       }
     }
     
-    // 渲染
     function renderLeads() {
       const list = document.getElementById('resultsList');
       
@@ -202,22 +272,54 @@
       allLeads.sort((a, b) => (b.score || 0) - (a.score || 0));
       
       list.innerHTML = allLeads.map(lead => {
+        // 聯繫方式標籤
+        const contacts = [];
+        if (lead.line) contacts.push(`<span class="contact-tag line">📱 LINE: ${lead.line}</span>`);
+        if (lead.phone) contacts.push(`<span class="contact-tag phone">📞 ${lead.phone}</span>`);
+        if (lead.email) contacts.push(`<span class="contact-tag email">✉️ ${lead.email}</span>`);
+        if (lead.fb) contacts.push(`<span class="contact-tag fb">📘 FB</span>`);
+        if (lead.other_contact) contacts.push(`<span class="contact-tag other">📎 ${lead.other_contact}</span>`);
+        
+        const contactHtml = contacts.length > 0 ? contacts.join('') : '<span class="contact-tag none">無聯繫方式</span>';
+        
+        // 狀態標籤
         const tagClass = lead.status || 'new';
         const tagText = { 'new': '新資料', 'contacted': '已聯繫', 'interested': '有興趣', 'no': '暫無興趣' }[tagClass] || '新資料';
         
         return `
           <div class="lead-item">
-            <div class="lead-score">${lead.score || 0}</div>
-            <div class="lead-content">
-              <div class="lead-title">${lead.title || '無標題'}</div>
-              <a href="${lead.url || '#'}" target="_blank" class="lead-url">${(lead.url || '').substring(0, 70)}...</a>
-              <div class="lead-content2">${lead.content || ''}</div>
-              <div class="lead-meta">
-                <span class="lead-tag ${tagClass}">${tagText}</span>
-                <span style="color:#999;font-size:0.75rem;">${new Date(lead.createdAt).toLocaleDateString()}</span>
+            <div class="lead-header">
+              <div class="lead-title">${lead.niche ? '【' + lead.niche + '】 ' : ''}${lead.title || '無標題'}</div>
+              <div class="lead-score">${lead.score || 0}%</div>
+            </div>
+            
+            <div class="lead-info">
+              <div class="info-group">
+                <div class="info-label">賽道</div>
+                <div class="info-value ${!lead.niche ? 'empty' : ''}">${lead.niche || '待分析'}</div>
+              </div>
+              <div class="info-group">
+                <div class="info-label">來源</div>
+                <div class="info-value">${lead.source || '-'}</div>
+              </div>
+              <div class="info-group">
+                <div class="info-label">狀態</div>
+                <div class="info-value"><span class="lead-tag ${tagClass}">${tagText}</span></div>
               </div>
             </div>
-            <div class="lead-actions">
+            
+            <div class="lead-contact">
+              ${contactHtml}
+            </div>
+            
+            <div class="lead-reason">
+              📊 評分原因：${lead.reason || '待 AI 分析'}
+            </div>
+            
+            <a href="${lead.url || '#'}" target="_blank" class="lead-url">${lead.url || ''}</a>
+            
+            <div class="lead-actions" style="margin-top:15px;">
+              <button class="btn-edit" onclick="openEdit('${lead.id}')">✏️ 編輯</button>
               <button class="btn-contact" onclick="updateStatus('${lead.id}', 'contacted')">已聯繫</button>
               <button class="btn-interest" onclick="updateStatus('${lead.id}', 'interested')">有興趣</button>
               <button class="btn-no" onclick="updateStatus('${lead.id}', 'no')">無興趣</button>
@@ -228,7 +330,50 @@
       }).join('');
     }
     
-    // 更新狀態
+    // 開啟編輯 Modal
+    function openEdit(id) {
+      const lead = allLeads.find(l => l.id === id);
+      if (!lead) return;
+      
+      document.getElementById('editId').value = id;
+      document.getElementById('editLine').value = lead.line || '';
+      document.getElementById('editPhone').value = lead.phone || '';
+      document.getElementById('editEmail').value = lead.email || '';
+      document.getElementById('editFb').value = lead.fb || '';
+      document.getElementById('editOther').value = lead.other_contact || '';
+      document.getElementById('editScore').value = lead.score || 0;
+      document.getElementById('editReason').value = lead.reason || '';
+      
+      document.getElementById('editModal').classList.add('show');
+    }
+    
+    function closeModal() {
+      document.getElementById('editModal').classList.remove('show');
+    }
+    
+    async function saveEdit() {
+      const id = document.getElementById('editId').value;
+      const data = {
+        line: document.getElementById('editLine').value,
+        phone: document.getElementById('editPhone').value,
+        email: document.getElementById('editEmail').value,
+        fb: document.getElementById('editFb').value,
+        other_contact: document.getElementById('editOther').value,
+        score: parseInt(document.getElementById('editScore').value) || 0,
+        reason: document.getElementById('editReason').value
+      };
+      
+      await fetch('/api/leads/update', {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({ id, ...data })
+      });
+      
+      closeModal();
+      loadLeads();
+      showToast('✅ 已儲存');
+    }
+    
     async function updateStatus(id, status) {
       await fetch('/api/leads/update', {
         method: 'POST',
@@ -238,14 +383,12 @@
       loadLeads();
     }
     
-    // 刪除
     async function deleteLead(id) {
       if (!confirm('確定要刪除嗎？')) return;
       await fetch('/api/leads/' + id, { method: 'DELETE' });
       loadLeads();
     }
     
-    // 統計
     function updateStats() {
       document.getElementById('totalCount').textContent = allLeads.length;
       document.getElementById('newCount').textContent = allLeads.filter(l => l.status === 'new' || !l.status).length;
@@ -253,7 +396,10 @@
       document.getElementById('interestedCount').textContent = allLeads.filter(l => l.status === 'interested').length;
     }
     
-    // 提示
+    function exportCSV() {
+      window.open('/api/leads/export', '_blank');
+    }
+    
     function showToast(msg) {
       const t = document.getElementById('toast');
       t.textContent = msg;
