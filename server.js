@@ -9,9 +9,14 @@ const app = express();
 app.use(express.json());
 app.use(express.static('public'));
 
-// API Keys
-const GOOGLE_API_KEY = 'AIzaSyCfxldtVFOGcQLoVBc5bMyKECi1uKQ8lCY';
-const TAVILY_API_KEY = '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';
+// API Keys - 從環境變數讀取
+const GOOGLE_API_KEY = process.env.GOOGLE_API_KEY;
+const TAVILY_API_KEY = process.env.TAVILY_API_KEY;
+
+// 檢查 API Key 是否設定
+if (!GOOGLE_API_KEY || !TAVILY_API_KEY) {
+  console.error('⚠️ 請在 Zeabur 設定環境變數 GOOGLE_API_KEY 和 TAVILY_API_KEY');
+}
 
 // 資料庫路徑
 const LEADS_FILE = path.join(__dirname, 'leads.json');
