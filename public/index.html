@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>🎯 潛在客戶搜尋系統 V2</title>
+  <title>🎯 潛在客戶深度分析系統</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f0f2f5; }
@@ -12,49 +12,38 @@
     .header h1 { font-size: 1.3rem; display: flex; align-items: center; gap: 10px; }
     .header .badge { background: #ffa502; color: #333; padding: 2px 8px; border-radius: 4px; font-size: 0.7rem; }
     
-    .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    .container { max-width: 900px; margin: 0 auto; padding: 20px; }
     
-    .search-box { background: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    /* 搜尋框 */
+    .search-box { background: white; padding: 25px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
     .search-box h2 { margin-bottom: 15px; color: #333; }
+    .search-box p { color: #666; font-size: 0.9rem; margin-bottom: 15px; }
     .search-form { display: flex; gap: 10px; }
-    .search-form input { flex: 1; padding: 12px; border: 1px solid #ddd; border-radius: 8px; font-size: 1rem; }
-    .search-form button { padding: 12px 24px; background: #1a1a2e; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; }
+    .search-form input { flex: 1; padding: 14px; border: 2px solid #ddd; border-radius: 8px; font-size: 1rem; }
+    .search-form input:focus { border-color: #667eea; outline: none; }
+    .search-form button { padding: 14px 30px; background: #1a1a2e; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 1rem; }
     .search-form button:disabled { background: #ccc; }
     
-    .quick-search { margin-top: 15px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-    .quick-search span { color: #666; font-size: 0.9rem; }
-    .quick-btn { padding: 6px 14px; background: #f0f0f0; border: none; border-radius: 20px; cursor: pointer; font-size: 0.85rem; }
-    .quick-btn:hover { background: #e0e0e0; }
-    .quick-btn.force { background: #ffa502; color: #333; }
+    /* 分析結果卡片 */
+    .result-card { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); margin-bottom: 20px; overflow: hidden; }
+    .result-header { background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+    .result-header h3 { font-size: 1.3rem; }
+    .result-score { background: white; color: #667eea; padding: 10px 20px; border-radius: 25px; font-weight: bold; font-size: 1.2rem; }
     
-    .stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 15px; margin-bottom: 20px; }
-    .stat-card { background: white; padding: 15px; border-radius: 12px; text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .stat-card .num { font-size: 1.8rem; font-weight: bold; color: #1a1a2e; }
-    .stat-card .label { color: #666; font-size: 0.8rem; margin-top: 5px; }
+    .result-body { padding: 20px; }
     
-    .results { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
-    .results-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
-    .results-header h3 { color: #333; }
-    .results-header button { padding: 8px 16px; background: #1a1a2e; color: white; border: none; border-radius: 6px; cursor: pointer; }
-    
-    .lead-item { padding: 20px; border-bottom: 1px solid #eee; }
-    .lead-item:last-child { border-bottom: none; }
-    
-    .lead-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-    .lead-title { font-weight: bold; font-size: 1.1rem; color: #333; }
-    .lead-score { 
-      background: linear-gradient(135deg, #667eea, #764ba2); color: white; 
-      padding: 8px 16px; border-radius: 20px; font-weight: bold; 
-    }
-    
-    .lead-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
-    .info-group { }
-    .info-label { color: #999; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 3px; }
-    .info-value { color: #333; font-size: 0.95rem; }
+    /* 基本資料 */
+    .info-section { margin-bottom: 20px; }
+    .info-section h4 { color: #333; margin-bottom: 10px; font-size: 1rem; border-bottom: 2px solid #667eea; padding-bottom: 5px; }
+    .info-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+    .info-item { background: #f8f9fa; padding: 10px; border-radius: 6px; }
+    .info-label { color: #666; font-size: 0.75rem; text-transform: uppercase; }
+    .info-value { color: #333; font-weight: 500; margin-top: 3px; }
     .info-value.empty { color: #ccc; font-style: italic; }
     
-    .lead-contact { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; }
-    .contact-tag { padding: 4px 12px; border-radius: 15px; font-size: 0.8rem; display: flex; align-items: center; gap: 5px; }
+    /* 聯繫方式 */
+    .contact-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+    .contact-tag { padding: 6px 14px; border-radius: 20px; font-size: 0.85rem; display: flex; align-items: center; gap: 5px; }
     .contact-tag.line { background: #06C755; color: white; }
     .contact-tag.phone { background: #4285f4; color: white; }
     .contact-tag.email { background: #ea4335; color: white; }
@@ -62,143 +51,98 @@
     .contact-tag.other { background: #9c27b0; color: white; }
     .contact-tag.none { background: #f5f5f5; color: #999; }
     
-    .lead-reason { background: #fff9e6; padding: 10px 15px; border-radius: 8px; font-size: 0.85rem; color: #666; border-left: 3px solid #ffa502; margin-bottom: 15px; }
+    /* 評估分析 */
+    .analysis-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; margin-bottom: 20px; }
+    @media (max-width: 600px) { .analysis-grid { grid-template-columns: 1fr; } }
+    .analysis-box { padding: 15px; border-radius: 8px; }
+    .analysis-box.strengths { background: #e8f5e9; border-left: 4px solid #4caf50; }
+    .analysis-box.weaknesses { background: #ffebee; border-left: 4px solid #f44336; }
+    .analysis-box.opportunities { background: #e3f2fd; border-left: 4px solid #2196f3; }
+    .analysis-box.threats { background: #fff3e0; border-left: 4px solid #ff9800; }
+    .analysis-box h5 { font-size: 0.85rem; margin-bottom: 8px; }
+    .analysis-box.strengths h5 { color: #2e7d32; }
+    .analysis-box.weaknesses h5 { color: #c62828; }
+    .analysis-box.opportunities h5 { color: #1565c0; }
+    .analysis-box.threats h5 { color: #e65100; }
+    .analysis-box p { font-size: 0.85rem; color: #666; }
     
-    .lead-actions { display: flex; gap: 8px; flex-wrap: wrap; }
-    .lead-actions button { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
-    .btn-edit { background: #667eea; color: white; }
-    .btn-contact { background: #06C755; color: white; }
-    .btn-interest { background: #ffa502; color: #333; }
-    .btn-no { background: #ff4757; color: white; }
-    .btn-del { background: #999; color: white; }
+    /* 談判策略 */
+    .talk-strategy { background: #fff9e6; padding: 15px; border-radius: 8px; border-left: 4px solid #ffa502; margin-bottom: 20px; }
+    .talk-strategy h5 { color: #f57c00; margin-bottom: 8px; }
+    .talk-strategy p { font-size: 0.9rem; color: #666; }
     
-    .lead-url { color: #667eea; font-size: 0.85rem; text-decoration: none; word-break: break-all; }
-    .lead-url:hover { text-decoration: underline; }
+    /* 評分原因 */
+    .reason-box { background: #f5f5f5; padding: 15px; border-radius: 8px; margin-bottom: 20px; }
+    .reason-box h5 { color: #333; margin-bottom: 8px; }
+    .reason-box p { color: #666; font-size: 0.9rem; }
+    
+    /* 談判切入點 */
+    .tips-box { background: #e8f5e9; padding: 15px; border-radius: 8px; border-left: 4px solid #4caf50; margin-bottom: 20px; }
+    .tips-box h5 { color: #2e7d32; margin-bottom: 10px; }
+    .tips-box ul { margin: 0; padding-left: 20px; color: #666; font-size: 0.9rem; }
+    .tips-box li { margin-bottom: 5px; }
+    
+    /* 參考來源 - 可展開 */
+    .sources-section { border-top: 1px solid #eee; padding-top: 20px; }
+    .sources-toggle { background: #f5f5f5; padding: 10px 15px; border-radius: 6px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+    .sources-toggle:hover { background: #e0e0e0; }
+    .sources-toggle h5 { color: #666; font-size: 0.9rem; }
+    .sources-toggle .arrow { transition: transform 0.3s; }
+    .sources-toggle.open .arrow { transform: rotate(180deg); }
+    .sources-list { display: none; padding: 15px; background: #fafafa; }
+    .sources-list.show { display: block; }
+    .source-item { padding: 10px; background: white; border-radius: 6px; margin-bottom: 8px; }
+    .source-item a { color: #667eea; text-decoration: none; font-size: 0.85rem; }
+    .source-item a:hover { text-decoration: underline; }
+    .source-item p { color: #999; font-size: 0.75rem; margin-top: 5px; }
+    
+    /* 歷史記錄 */
+    .history-section { background: white; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+    .history-header { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .history-header h3 { color: #333; }
+    .history-item { padding: 15px 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+    .history-item:last-child { border-bottom: none; }
+    .history-info h4 { color: #333; margin-bottom: 5px; }
+    .history-info p { color: #999; font-size: 0.8rem; }
+    .history-actions { display: flex; gap: 8px; }
+    .history-actions button { padding: 6px 12px; border: none; border-radius: 4px; cursor: pointer; font-size: 0.8rem; }
+    .btn-view { background: #667eea; color: white; }
+    .btn-del { background: #ff4757; color: white; }
     
     .loading { text-align: center; padding: 40px; color: #666; }
     .empty { text-align: center; padding: 40px; color: #999; }
     
     .toast { position: fixed; bottom: 20px; right: 20px; background: #333; color: white; padding: 12px 20px; border-radius: 8px; font-size: 0.9rem; opacity: 0; transition: opacity 0.3s; z-index: 1000; }
     .toast.show { opacity: 1; }
-    
-    /* 編輯 Modal */
-    .modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; }
-    .modal.show { display: flex; align-items: center; justify-content: center; }
-    .modal-content { background: white; padding: 25px; border-radius: 12px; width: 90%; max-width: 600px; max-height: 80vh; overflow-y: auto; }
-    .modal h3 { margin-bottom: 20px; color: #333; }
-    .form-group { margin-bottom: 15px; }
-    .form-group label { display: block; color: #666; font-size: 0.85rem; margin-bottom: 5px; }
-    .form-group input { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 0.95rem; }
-    .form-row { display: grid; grid-template-columns: 1fr 2fr; gap: 10px; align-items: center; }
-    .form-row label { color: #666; font-size: 0.85rem; }
-    .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; margin-top: 20px; }
-    .modal-buttons button { padding: 10px 20px; border: none; border-radius: 6px; cursor: pointer; }
-    .btn-save { background: #06C755; color: white; }
-    .btn-cancel { background: #ccc; color: #333; }
   </style>
 </head>
 <body>
   <div class="header">
-    <h1>🎯 潛在客戶搜尋系統 <span class="badge">V2</span></h1>
+    <h1>🎯 潛在客戶深度分析 <span class="badge">V2</span></h1>
   </div>
   
   <div class="container">
     <!-- 搜尋框 -->
     <div class="search-box">
-      <h2>🔍 搜尋講師</h2>
+      <h2>🔍 深度分析對象</h2>
+      <p>輸入你想深度了解的講師/公司名稱，我會全面搜尋資料並進行分析評估</p>
       <div class="search-form">
-        <input type="text" id="searchInput" placeholder="輸入關鍵字，例如：健身教練、英文老師、理財課程...">
-        <button onclick="doSearch()" id="searchBtn">搜尋 + AI 分析</button>
-      </div>
-      <div class="quick-search">
-        <span>快速搜尋：</span>
-        <button class="quick-btn" onclick="quickSearch('健身教練 線上課程')">健身</button>
-        <button class="quick-btn" onclick="quickSearch('英文老師 線上課程')">英文</button>
-        <button class="quick-btn" onclick="quickSearch('理財投資 課程 LINE')">理財</button>
-        <button class="quick-btn" onclick="quickSearch('LINE行銷 課程 講師')">LINE行銷</button>
-        <button class="quick-btn" onclick="quickSearch('AI教學 線上課程')">AI</button>
-        <button class="quick-btn" onclick="quickSearch('創業 變現 課程')">創業</button>
-        <button class="quick-btn force" onclick="quickSearch('健身教練 線上課程', true)">🔄 強制重搜</button>
+        <input type="text" id="targetInput" placeholder="例如：Peeta葛格、Joanne老師、股癌...">
+        <button onclick="analyze()" id="analyzeBtn">開始分析</button>
       </div>
     </div>
     
-    <!-- 統計 -->
-    <div class="stats">
-      <div class="stat-card">
-        <div class="num" id="totalCount">0</div>
-        <div class="label">總數據</div>
-      </div>
-      <div class="stat-card">
-        <div class="num" id="newCount">0</div>
-        <div class="label">新資料</div>
-      </div>
-      <div class="stat-card">
-        <div class="num" id="contactedCount">0</div>
-        <div class="label">已聯繫</div>
-      </div>
-      <div class="stat-card">
-        <div class="num" id="interestedCount">0</div>
-        <div class="label">有興趣</div>
-      </div>
-    </div>
+    <!-- 分析結果 -->
+    <div id="resultArea"></div>
     
-    <!-- 結果列表 -->
-    <div class="results">
-      <div class="results-header">
-        <h3>📋 搜尋結果</h3>
-        <div style="display:flex;gap:10px;">
-          <button onclick="loadLeads()">🔄 重新整理</button>
-          <button onclick="exportCSV()" style="background:#06C755;">📥 匯出 CSV</button>
-        </div>
+    <!-- 歷史記錄 -->
+    <div class="history-section">
+      <div class="history-header">
+        <h3>📋 歷史分析記錄</h3>
+        <button onclick="loadHistory()" style="padding:8px 16px;background:#667eea;color:white;border:none;border-radius:6px;cursor:pointer;">🔄 重新整理</button>
       </div>
-      <div id="resultsList">
+      <div id="historyList">
         <div class="loading">載入中...</div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- 編輯 Modal -->
-  <div class="modal" id="editModal">
-    <div class="modal-content">
-      <h3>✏️ 編輯資料</h3>
-      <input type="hidden" id="editId">
-      
-      <div class="form-row">
-        <label>LINE：</label>
-        <input type="text" id="editLine" placeholder="@xxx 或 LINE ID">
-      </div>
-      <div class="form-row">
-        <label>電話：</label>
-        <input type="text" id="editPhone" placeholder="09xx-xxx-xxx">
-      </div>
-      <div class="form-row">
-        <label>Email：</label>
-        <input type="text" id="editEmail" placeholder="xxx@gmail.com">
-      </div>
-      <div class="form-row">
-        <label>FB：</label>
-        <input type="text" id="editFb" placeholder="FB 粉絲團連結">
-      </div>
-      <div class="form-row">
-        <label>其他聯繫：</label>
-        <input type="text" id="editOther" placeholder="其他聯繫方式">
-      </div>
-      <div class="form-row">
-        <label>成交率：</label>
-        <input type="number" id="editScore" min="0" max="100">
-      </div>
-      <div class="form-row">
-        <label>評分原因：</label>
-        <input type="text" id="editReason" placeholder="為什麼給這個分數">
-      </div>
-      <div class="form-row">
-        <label>談判切入點：</label>
-        <input type="text" id="editTalkTips" placeholder="如何跟這位老師開啟話題">
-      </div>
-      
-      <div class="modal-buttons">
-        <button class="btn-cancel" onclick="closeModal()">取消</button>
-        <button class="btn-save" onclick="saveEdit()">儲存</button>
       </div>
     </div>
   </div>
@@ -206,210 +150,214 @@
   <div class="toast" id="toast"></div>
 
   <script>
-    let allLeads = [];
+    let currentResult = null;
     
     window.onload = function() {
-      loadLeads();
+      loadHistory();
     };
     
-    function quickSearch(keyword, force = false) {
-      document.getElementById('searchInput').value = keyword;
-      doSearch(force);
-    }
-    
-    async function doSearch(force = false) {
-      const keyword = document.getElementById('searchInput').value.trim();
-      if (!keyword) return;
+    async function analyze() {
+      const target = document.getElementById('targetInput').value.trim();
+      if (!target) {
+        showToast('請輸入分析對象名稱');
+        return;
+      }
       
-      const btn = document.getElementById('searchBtn');
+      const btn = document.getElementById('analyzeBtn');
       btn.disabled = true;
-      btn.textContent = '搜尋 + AI 分析中...';
+      btn.textContent = '分析中...';
       
       try {
-        const res = await fetch('/api/leads/search', {
+        const res = await fetch('/api/analyze', {
           method: 'POST',
           headers: {'Content-Type': 'application/json'},
-          body: JSON.stringify({ keyword, force })
+          body: JSON.stringify({ target })
         });
         const data = await res.json();
         
         if (data.error) {
           showToast('❌ ' + data.error);
-        } else if (data.message) {
-          showToast('📋 ' + data.message);
-          loadLeads();
         } else {
-          showToast('✅ 完成！新增 ' + data.count + ' 筆，總共 ' + data.total + ' 筆');
-          loadLeads();
+          showToast('✅ 分析完成！');
+          currentResult = data.result;
+          renderResult(data.result);
+          loadHistory();
         }
       } catch(e) {
-        showToast('❌ 搜尋失敗: ' + e.message);
+        showToast('❌ 分析失敗: ' + e.message);
       }
       
       btn.disabled = false;
-      btn.textContent = '搜尋 + AI 分析';
+      btn.textContent = '開始分析';
     }
     
-    async function loadLeads() {
-      const list = document.getElementById('resultsList');
+    function renderResult(r) {
+      const area = document.getElementById('resultArea');
+      
+      // 聯繫方式
+      const contacts = [];
+      if (r.line) contacts.push(`<span class="contact-tag line">📱 LINE: ${r.line}</span>`);
+      if (r.phone) contacts.push(`<span class="contact-tag phone">📞 ${r.phone}</span>`);
+      if (r.email) contacts.push(`<span class="contact-tag email">✉️ ${r.email}</span>`);
+      if (r.fb) contacts.push(`<span class="contact-tag fb">📘 FB</span>`);
+      if (r.other_contact) contacts.push(`<span class="contact-tag other">📎 ${r.other_contact}</span>`);
+      const contactHtml = contacts.length > 0 ? contacts.join('') : '<span class="contact-tag none">無聯繫方式</span>';
+      
+      // SWOT 分析
+      const analysis = r.analysis || {};
+      const swotHtml = `
+        <div class="analysis-grid">
+          <div class="analysis-box strengths">
+            <h5>💪 優勢</h5>
+            <p>${analysis.strengths || '待分析'}</p>
+          </div>
+          <div class="analysis-box weaknesses">
+            <h5>⚠️ 劣勢</h5>
+            <p>${analysis.weaknesses || '待分析'}</p>
+          </div>
+          <div class="analysis-box opportunities">
+            <h5>🚀 機會</h5>
+            <p>${analysis.opportunities || '待分析'}</p>
+          </div>
+          <div class="analysis-box threats">
+            <h5>🔥 威脅</h5>
+            <p>${analysis.threats || '待分析'}</p>
+          </div>
+        </div>
+      `;
+      
+      // 參考來源
+      const sourcesHtml = r.sources ? r.sources.map(s => `
+        <div class="source-item">
+          <a href="${s.url}" target="_blank">${s.title}</a>
+          <p>${s.content ? s.content.substring(0, 150) + '...' : ''}</p>
+        </div>
+      `).join('') : '';
+      
+      area.innerHTML = `
+        <div class="result-card">
+          <div class="result-header">
+            <h3>${r.niche ? '【' + r.niche + '】 ' : ''}${r.target}</h3>
+            <div class="result-score">${r.score}%</div>
+          </div>
+          
+          <div class="result-body">
+            <!-- 基本資料 -->
+            <div class="info-section">
+              <h4>📌 基本資料</h4>
+              <div class="info-grid">
+                <div class="info-item">
+                  <div class="info-label">對象名稱</div>
+                  <div class="info-value">${r.name || r.target}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">細分賽道</div>
+                  <div class="info-value ${!r.niche ? 'empty' : ''}">${r.niche || '待分析'}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">資料來源數</div>
+                  <div class="info-value">${r.sources ? r.sources.length : 0} 個來源</div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- 聯繫方式 -->
+            <div class="info-section">
+              <h4>📱 聯繫方式</h4>
+              <div class="contact-tags">${contactHtml}</div>
+            </div>
+            
+            <!-- SWOT 分析 -->
+            <div class="info-section">
+              <h4>📊 SWOT 分析</h4>
+              ${swotHtml}
+            </div>
+            
+            <!-- 整體評估 -->
+            <div class="reason-box">
+              <h5>📝 整體評估</h5>
+              <p>${r.reason || '待分析'}</p>
+            </div>
+            
+            <!-- 談判切入點 -->
+            ${r.talk_tips ? `
+            <div class="tips-box">
+              <h5>💡 談判切入點</h5>
+              <ul>
+                ${r.talk_tips.split('\n').filter(t => t.trim()).map(t => '<li>' + t + '</li>').join('')}
+              </ul>
+            </div>
+            ` : ''}
+            
+            <!-- 參考來源（可展開） -->
+            <div class="sources-section">
+              <div class="sources-toggle" onclick="toggleSources(this)">
+                <h5>📚 參考來源（${r.sources ? r.sources.length : 0} 個）</h5>
+                <span class="arrow">▼</span>
+              </div>
+              <div class="sources-list">
+                ${sourcesHtml || '無'}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    function toggleSources(btn) {
+      btn.classList.toggle('open');
+      btn.nextElementSibling.classList.toggle('show');
+    }
+    
+    async function loadHistory() {
+      const list = document.getElementById('historyList');
       list.innerHTML = '<div class="loading">載入中...</div>';
       
       try {
         const res = await fetch('/api/leads');
-        allLeads = await res.json();
-        renderLeads();
-        updateStats();
-      } catch(e) {
-        list.innerHTML = '<div class="empty">載入失敗: ' + e.message + '</div>';
-      }
-    }
-    
-    function renderLeads() {
-      const list = document.getElementById('resultsList');
-      
-      if (allLeads.length === 0) {
-        list.innerHTML = '<div class="empty">尚無資料，請先搜尋講師關鍵字</div>';
-        return;
-      }
-      
-      // 依分數排序
-      allLeads.sort((a, b) => (b.score || 0) - (a.score || 0));
-      
-      list.innerHTML = allLeads.map(lead => {
-        // 聯繫方式標籤
-        const contacts = [];
-        if (lead.line) contacts.push(`<span class="contact-tag line">📱 LINE: ${lead.line}</span>`);
-        if (lead.phone) contacts.push(`<span class="contact-tag phone">📞 ${lead.phone}</span>`);
-        if (lead.email) contacts.push(`<span class="contact-tag email">✉️ ${lead.email}</span>`);
-        if (lead.fb) contacts.push(`<span class="contact-tag fb">📘 FB</span>`);
-        if (lead.other_contact) contacts.push(`<span class="contact-tag other">📎 ${lead.other_contact}</span>`);
+        const data = await res.json();
         
-        const contactHtml = contacts.length > 0 ? contacts.join('') : '<span class="contact-tag none">無聯繫方式</span>';
+        if (data.length === 0) {
+          list.innerHTML = '<div class="empty">尚無分析記錄</div>';
+          return;
+        }
         
-        // 狀態標籤
-        const tagClass = lead.status || 'new';
-        const tagText = { 'new': '新資料', 'contacted': '已聯繫', 'interested': '有興趣', 'no': '暫無興趣' }[tagClass] || '新資料';
-        
-        return `
-          <div class="lead-item">
-            <div class="lead-header">
-              <div class="lead-title">${lead.niche ? '【' + lead.niche + '】 ' : ''}${lead.title || '無標題'}</div>
-              <div class="lead-score">${lead.score || 0}%</div>
+        list.innerHTML = data.map(item => `
+          <div class="history-item">
+            <div class="history-info">
+              <h4>${item.niche ? '【' + item.niche + '】 ' : ''}${item.target}</h4>
+              <p>成交率：${item.score}% | ${new Date(item.createdAt).toLocaleString()}</p>
             </div>
-            
-            <div class="lead-info">
-              <div class="info-group">
-                <div class="info-label">賽道</div>
-                <div class="info-value ${!lead.niche ? 'empty' : ''}">${lead.niche || '待分析'}</div>
-              </div>
-              <div class="info-group">
-                <div class="info-label">來源</div>
-                <div class="info-value">${lead.source || '-'}</div>
-              </div>
-              <div class="info-group">
-                <div class="info-label">狀態</div>
-                <div class="info-value"><span class="lead-tag ${tagClass}">${tagText}</span></div>
-              </div>
-            </div>
-            
-            <div class="lead-contact">
-              ${contactHtml}
-            </div>
-            
-            <div class="lead-reason">
-              📊 評分原因：${lead.reason || '待 AI 分析'}
-            </div>
-            
-            ${lead.talk_tips ? `
-            <div class="lead-tips" style="background:#e8f5e9;padding:10px 15px;border-radius:8px;font-size:0.85rem;color:#2e7d32;border-left:3px solid #4caf50;margin-bottom:15px;">
-              💡 談判切入點：${lead.talk_tips}
-            </div>
-            ` : ''}
-            
-            <a href="${lead.url || '#'}" target="_blank" class="lead-url">${lead.url || ''}</a>
-            
-            <div class="lead-actions" style="margin-top:15px;">
-              <button class="btn-edit" onclick="openEdit('${lead.id}')">✏️ 編輯</button>
-              <button class="btn-contact" onclick="updateStatus('${lead.id}', 'contacted')">已聯繫</button>
-              <button class="btn-interest" onclick="updateStatus('${lead.id}', 'interested')">有興趣</button>
-              <button class="btn-no" onclick="updateStatus('${lead.id}', 'no')">無興趣</button>
-              <button class="btn-del" onclick="deleteLead('${lead.id}')">刪除</button>
+            <div class="history-actions">
+              <button class="btn-view" onclick="viewResult('${item.id}')">查看</button>
+              <button class="btn-del" onclick="deleteResult('${item.id}')">刪除</button>
             </div>
           </div>
-        `;
-      }).join('');
+        `).join('');
+        
+      } catch(e) {
+        list.innerHTML = '<div class="empty">載入失敗</div>';
+      }
     }
     
-    // 開啟編輯 Modal
-    function openEdit(id) {
-      const lead = allLeads.find(l => l.id === id);
-      if (!lead) return;
-      
-      document.getElementById('editId').value = id;
-      document.getElementById('editLine').value = lead.line || '';
-      document.getElementById('editPhone').value = lead.phone || '';
-      document.getElementById('editEmail').value = lead.email || '';
-      document.getElementById('editFb').value = lead.fb || '';
-      document.getElementById('editOther').value = lead.other_contact || '';
-      document.getElementById('editScore').value = lead.score || 0;
-      document.getElementById('editReason').value = lead.reason || '';
-      document.getElementById('editTalkTips').value = lead.talk_tips || '';
-      
-      document.getElementById('editModal').classList.add('show');
+    function viewResult(id) {
+      fetch('/api/leads')
+        .then(r => r.json())
+        .then(data => {
+          const item = data.find(l => l.id === id);
+          if (item) {
+            currentResult = item;
+            renderResult(item);
+            window.scrollTo(0, 0);
+          }
+        });
     }
     
-    function closeModal() {
-      document.getElementById('editModal').classList.remove('show');
-    }
-    
-    async function saveEdit() {
-      const id = document.getElementById('editId').value;
-      const data = {
-        line: document.getElementById('editLine').value,
-        phone: document.getElementById('editPhone').value,
-        email: document.getElementById('editEmail').value,
-        fb: document.getElementById('editFb').value,
-        other_contact: document.getElementById('editOther').value,
-        score: parseInt(document.getElementById('editScore').value) || 0,
-        reason: document.getElementById('editReason').value,
-        talk_tips: document.getElementById('editTalkTips').value
-      };
-      
-      await fetch('/api/leads/update', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ id, ...data })
-      });
-      
-      closeModal();
-      loadLeads();
-      showToast('✅ 已儲存');
-    }
-    
-    async function updateStatus(id, status) {
-      await fetch('/api/leads/update', {
-        method: 'POST',
-        headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ id, status })
-      });
-      loadLeads();
-    }
-    
-    async function deleteLead(id) {
+    async function deleteResult(id) {
       if (!confirm('確定要刪除嗎？')) return;
       await fetch('/api/leads/' + id, { method: 'DELETE' });
-      loadLeads();
-    }
-    
-    function updateStats() {
-      document.getElementById('totalCount').textContent = allLeads.length;
-      document.getElementById('newCount').textContent = allLeads.filter(l => l.status === 'new' || !l.status).length;
-      document.getElementById('contactedCount').textContent = allLeads.filter(l => l.status === 'contacted').length;
-      document.getElementById('interestedCount').textContent = allLeads.filter(l => l.status === 'interested').length;
-    }
-    
-    function exportCSV() {
-      window.open('/api/leads/export', '_blank');
+      loadHistory();
+      showToast('已刪除');
     }
     
     function showToast(msg) {
