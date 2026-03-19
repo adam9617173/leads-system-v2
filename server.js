@@ -60,21 +60,25 @@ async function analyzeTargetDeep(targetName, allData) {
 - 功能：幫老師處理學生問題、自動回覆學員問題、教材導讀、個人化學習輔導
 - 隱藏價值：建立私域流量、養客、未來可群發活動、24/7自動化服務、可服務無限學生
 
+【重要】分析對象可能是：知識付費講師、公司、工作室、自由業者、或其他身份。請根據搜到的資料自動判斷對方的身份類型。
+
 【收集到的參考資料】
 ${sourcesText}
 
 請用 JSON 格式回傳以下欄位（如果找不到該欄位資料，請用 null）：
 
 {
-  "name": "對象名稱（講師/公司/個人）",
-  "niche": "細分賽道（例如：健身教練、雅思考試、理財投資、AI工具教學等）",
+  "name": "對象名稱",
+  "identity_type": "身份類型（自動判斷：知識付費講師/公司/工作室/自由業者/個人工作者/其他）",
+  "niche": "細分領域（例如：健身教練、雅思考試、理財投資、AI工具教學、電商、顧問服務等）",
   "line": "LINE ID 或 LINE@（所有找到的）",
   "phone": "電話號碼（所有找到的）",
   "email": "電子郵件（所有找到的）",
   "fb": "Facebook 粉絲團或粉專連結（所有找到的）",
-  "other_contact": "其他聯繫方式",
-  "score": 成交率評分（0-100 的整數，根據：1.他的教學內容是否需要助教 2.他是否有痛點 3.27,000是否能負擔 4.買了能否幫他賺更多 5.他是否願意嘗試新工具）",
+  "other_contact": "其他聯繫方式（IG、Telegram等）",
+  "score": 成交率評分（0-100 的整數，根據：1.他的業務是否需要 AI 助教 2.他是否有痛點 3.27,000是否能負擔 4.買了能否幫他賺更多 5.他是否願意嘗試新工具）",
   "analysis": {
+    "identity_summary": "對方身份概述（你認為他是什麼身份，做什麼的）",
     "strengths": "優勢分析（他有哪些特點讓他可能需要伴讀精靈）",
     "weaknesses": "劣勢分析（哪些因素可能阻礙他購買）",
     "opportunities": "機會分析（市場趨勢對他有利嗎）",
@@ -82,7 +86,7 @@ ${sourcesText}
     "talk_strategy": "談判策略（如何跟他開啟對話）"
   },
   "reason": "整體評估總結（100字以內）",
-  "talk_tips": "具體談判切入點（3個具體建議，如何跟這位老師開啟話題）"
+  "talk_tips": "具體談判切入點（3個具體建議，如何跟這位潛在客戶開啟話題）"
 }
 
 只回傳 JSON，不要其他文字。`;
@@ -124,16 +128,24 @@ app.post('/api/analyze', async (req, res) => {
     console.log('【開始深度分析】：' + target);
     
     // ====== 深度搜尋階段 ======
-    // 對這個人進行多維度搜尋
+    // 對這個人/公司進行多維度搜尋（不限身份）
     const searchKeywords = [
-      target,
-      target + ' 線上課程',
-      target + ' 老師',
-      target + ' 課程',
-      target + ' LINE',
-      target + ' 評價',
-      target + ' 收費',
-      target + ' 變現'
+      target,                          // 直接搜本人/公司
+      target + ' 課程',                // 確認是否有教學
+      target + ' 教學',                // 教學相關
+      target + ' 收費',                // 商業模式
+      target + ' 價格',                // 報價
+      target + ' LINE',               // LINE 聯繫
+      target + ' FB',                 // FB 粉絲團
+      target + ' IG',                 // IG 帳號
+      target + ' 評價',               // 口碑
+      target + ' 評論',               // 評論
+      target + ' 公司',               // 公司型態
+      target + ' 工作室',             // 工作室型態
+      target + ' 作品',               // 專業作品
+      target + ' 影片',               // 影片/內容
+      target + ' 新聞',               // 最新動態
+      target + ' 創業'                // 創業/變現
     ];
     
     console.log('執行 ' + searchKeywords.length + ' 個關鍵字搜尋...');

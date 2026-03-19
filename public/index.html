@@ -251,7 +251,11 @@
                   <div class="info-value">${r.name || r.target}</div>
                 </div>
                 <div class="info-item">
-                  <div class="info-label">細分賽道</div>
+                  <div class="info-label">身份類型</div>
+                  <div class="info-value">${r.analysis?.identity_summary || (r.niche ? '可能為 ' + r.niche + ' 相關') : '待分析'}</div>
+                </div>
+                <div class="info-item">
+                  <div class="info-label">細分領域</div>
                   <div class="info-value ${!r.niche ? 'empty' : ''}">${r.niche || '待分析'}</div>
                 </div>
                 <div class="info-item">
