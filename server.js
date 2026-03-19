@@ -39,7 +39,7 @@ async function tavilySearch(query) {
   const response = await axios.post('https://api.tavily.com/search', {
     query: query,
     api_key: TAVILY_API_KEY,
-    max_results: 10
+    max_results: 5  // 減少到 5 個結果
   }, { timeout: 15000 });
   return response.data.results || [];
 }
@@ -165,7 +165,7 @@ app.post('/api/analyze', async (req, res) => {
     // ====== AI 深度分析 ======
     console.log('開始 AI 深度分析...');
     
-    const aiAnalysis = await analyzeTargetDeep(target, uniqueData.slice(0, 15));
+    const aiAnalysis = await analyzeTargetDeep(target, uniqueData.slice(0, 8));
     
     if (!aiAnalysis) {
       res.json({ error: 'AI 分析失敗，請稍後再試' });
@@ -191,7 +191,7 @@ app.post('/api/analyze', async (req, res) => {
       analysis: aiAnalysis.analysis || {},
       talk_tips: aiAnalysis.talk_tips || '',
       // 參考來源（可隱藏）
-      sources: uniqueData.slice(0, 15).map(d => ({
+      sources: uniqueData.slice(0, 8).map(d => ({
         title: d.title,
         url: d.url,
         content: d.content
