@@ -249,7 +249,7 @@
                 </div>
                 <div class="info-item">
                   <div class="info-label">身份類型</div>
-                  <div class="info-value">${(r.analysis && r.analysis.identity_summary) || (r.niche ? '可能為 ' + r.niche + ' 相關') : '待分析'}</div>
+                  <div class="info-value">${r.analysis && r.analysis.identity_summary || (r.niche ? '可能為 ' + r.niche + ' 相關') : '待分析'}</div>
                 </div>
                 <div class="info-item">
                   <div class="info-label">細分領域</div>
