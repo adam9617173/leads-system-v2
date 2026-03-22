@@ -227,12 +227,9 @@
       `;
       
       // 參考來源
-      const sourcesHtml = r.sources ? r.sources.map(s => `
-        <div class="source-item">
-          <a href="${s.url}" target="_blank">${s.title}</a>
-          <p>${s.content ? s.content.substring(0, 150) + '...' : ''}</p>
-        </div>
-      `).join('') : '';
+      const sourcesHtml = r.sources ? r.sources.map(s => 
+        '<div class="source-item"><a href="' + s.url + '" target="_blank">' + s.title + '</a><p>' + (s.content ? s.content.substring(0, 150) + '...' : '') + '</p></div>'
+      ).join('') : '';
       
       area.innerHTML = `
         <div class="result-card">
@@ -323,18 +320,9 @@
           return;
         }
         
-        list.innerHTML = data.map(item => `
-          <div class="history-item">
-            <div class="history-info">
-              <h4>${item.niche ? '【' + item.niche + '】 ' : ''}${item.target}</h4>
-              <p>成交率：${item.score}% | ${new Date(item.createdAt).toLocaleString()}</p>
-            </div>
-            <div class="history-actions">
-              <button class="btn-view" onclick="viewResult('${item.id}')">查看</button>
-              <button class="btn-del" onclick="deleteResult('${item.id}')">刪除</button>
-            </div>
-          </div>
-        `).join('');
+        list.innerHTML = data.map(item => 
+          '<div class="history-item"><div class="history-info"><h4>' + (item.niche ? '【' + item.niche + '】 ' : '') + item.target + '</h4><p>成交率：' + item.score + '% | ' + new Date(item.createdAt).toLocaleString() + '</p></div><div class="history-actions"><button class="btn-view" onclick="viewResult(\'' + item.id + '\')">查看</button><button class="btn-del" onclick="deleteResult(\'' + item.id + '\')">刪除</button></div></div>'
+        ).join('');
         
       } catch(e) {
         list.innerHTML = '<div class="empty">載入失敗</div>';
