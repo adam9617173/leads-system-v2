@@ -284,14 +284,11 @@
             </div>
             
             <!-- 談判切入點 -->
-            ${r.talk_tips ? `
-            <div class="tips-box">
-              <h5>💡 談判切入點</h5>
-              <ul>
-                ${r.talk_tips.split('\n').filter(t => t.trim()).map(t => '<li>' + t + '</li>').join('')}
-              </ul>
-            </div>
-            ` : ''}
+            ${r.talk_tips ? 
+            '<div class="tips-box"><h5>💡 談判切入點</h5><ul>' + 
+            r.talk_tips.split('\n').filter(t => t.trim()).map(t => '<li>' + t + '</li>').join('') + 
+            '</ul></div>' 
+            : ''}
             
             <!-- 參考來源（可展開） -->
             <div class="sources-section">
