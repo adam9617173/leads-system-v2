@@ -283,7 +283,7 @@
             <!-- 談判切入點 -->
             ${r.talk_tips ? 
             '<div class="tips-box"><h5>💡 談判切入點</h5><ul>' + 
-            r.talk_tips.split('\n').filter(t => t.trim()).map(t => '<li>' + t + '</li>').join('') + 
+            (Array.isArray(r.talk_tips) ? r.talk_tips.filter(t => t && t.trim()).map(t => '<li>' + t + '</li>').join('') : r.talk_tips.split('\n').filter(t => t && t.trim()).map(t => '<li>' + t + '</li>').join('')) + 
             '</ul></div>' 
             : ''}
             
